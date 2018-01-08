@@ -336,7 +336,7 @@ void play_mode_t::render_map(window_t * win) {
     win->print(term_left, 6, "Move with cursor keys,", 128, 128, 128);
     win->print(term_left, 7, "Numeric Keypad,", 128, 128, 128);
     win->print(term_left, 8, "or VI keys", 128, 128, 128);
-    win->print(term_left, 9, ". Waits", 128, 128, 128);
+    win->print(term_left, 9, ". Wait/Look for traps", 128, 128, 128);
 
     if (player.has_iron_key) {
         win->print(term_left, 11, "You have the iron key");
