@@ -33,14 +33,11 @@ play_mode_t::play_mode_t(const level_t * level) {
         } else if (tile_render[i].glyph == 240) {
             // TODO: Gold Door
         } else if (tile_render[i].glyph == 'k') {
-            set_floor(i);
-            // TODO: Kobold
+            set_monster(KOBOLD, i, x, y);
         } else if (tile_render[i].glyph == 'o') {
-            set_floor(i);
-            // TODO: Orc
+            set_monster(ORC, i, x, y);
         } else if (tile_render[i].glyph == 'D') {
-            set_floor(i);
-            // TODO: Dragon
+            set_monster(DRAGON, i, x, y);
         } else if (tile_render[i].glyph == 127) {
             set_pit_trap(i, x, y);
         } else if (tile_render[i].glyph == 241) {
@@ -126,6 +123,25 @@ bool play_mode_t::is_solid(const uint8_t &glyph) {
     }
 }
 
+void play_mode_t::set_monster(const monster_type_t &type, const int &idx, const int &x, const int &y) {
+    tile_render[idx].glyph = '.';
+    tile_render[idx].r = 128;
+    tile_render[idx].g = 128;
+    tile_render[idx].b = 128;
+
+    uint8_t glyph=0, r=255, g=0, b=0;
+    int hp = 0;
+    switch (type) {
+        case KOBOLD : { glyph='k'; hp = 1; } break;
+        case ORC : { glyph='o'; hp = 3; } break;
+        case DRAGON : { glyph='D'; hp = 20; } break;
+        default: printf("Unknown monster type!\n");
+    }
+
+    monster_t newmonster{ type, false, position_t{static_cast<uint8_t>(x), static_cast<uint8_t>(y)}, glyph, r, g, b, hp };
+    monsters.insert(std::make_pair(idx, newmonster));
+}
+
 void play_mode_t::cast_visibility() {
     std::fill(tile_visible.begin(), tile_visible.end(), false);
     rltk::visibility_sweep_2d<position_t, navigator_t>(player.pos, 16, 
@@ -168,13 +184,42 @@ void play_mode_t::handle_input(window_t * win) {
     }
 }
 
+bool play_mode_t::check_attack(const int &x, const int &y) {
+    std::vector<int> to_erase;
+    bool retval = false;
+
+    for (auto &mob : monsters) {
+        if (mob.second.pos.x == x && mob.second.pos.y == y) {
+            if (mob.second.type != DRAGON) mob.second.hit_points -= 5;
+            if (mob.second.hit_points < 1) {
+                to_erase.push_back(mob.first);
+                switch (mob.second.type) {
+                    case KOBOLD : log_entry("You bash the kobold on the head, killing it."); break;
+                    case ORC : log_entry("With a mightly swing, you behead the orc."); break;
+                    case DRAGON : log_entry("You tickle the dragon with your sword. It doesn't like it."); break;
+                }
+            }
+
+            retval = true;
+        }
+    }
+
+    for (const auto &idx : to_erase) {
+        monsters.erase(idx);
+    }
+
+    return retval;
+}
+
 void play_mode_t::do_turn(input_type_t &input) {
     // Player
     bool player_moved = false;    
     if (input == LEFT && player.pos.x > 1) {
         if (!tile_solid[mapidx(player.pos.x - 1, player.pos.y)]) {
-            --player.pos.x;
-            player_moved = true;
+            if (!check_attack(player.pos.x - 1, player.pos.y)) {
+                --player.pos.x;
+                player_moved = true;
+            }
         } else {
             position_t dest = player.pos;
             --dest.x;
@@ -182,8 +227,10 @@ void play_mode_t::do_turn(input_type_t &input) {
         }
     } else if (input == RIGHT && player.pos.x < level_width - 1) {
         if (!tile_solid[mapidx(player.pos.x + 1, player.pos.y)]) {
-            ++player.pos.x;
-            player_moved = true;
+            if (!check_attack(player.pos.x + 1, player.pos.y)) {
+                ++player.pos.x;
+                player_moved = true;
+            }
         } else {
             position_t dest = player.pos;
             ++dest.x;
@@ -191,8 +238,10 @@ void play_mode_t::do_turn(input_type_t &input) {
         }
     } else if (input == UP && player.pos.y > 1) {
         if (!tile_solid[mapidx(player.pos.x, player.pos.y-1)]) {
-            --player.pos.y;
-            player_moved = true;
+            if (!check_attack(player.pos.x, player.pos.y-1)) {
+                --player.pos.y;
+                player_moved = true;
+            }
         } else {
             position_t dest = player.pos;
             --dest.y;
@@ -200,8 +249,10 @@ void play_mode_t::do_turn(input_type_t &input) {
         }
     } else if (input == DOWN && player.pos.y < level_height - 1) {
         if (!tile_solid[mapidx(player.pos.x, player.pos.y+1)]) {
-            ++player.pos.y;
-            player_moved = true;
+            if (!check_attack(player.pos.x, player.pos.y+1)) {
+                ++player.pos.y;
+                player_moved = true;
+            }
         } else {
             position_t dest = player.pos;
             ++dest.y;
@@ -209,9 +260,11 @@ void play_mode_t::do_turn(input_type_t &input) {
         }
     } else if (input == UPLEFT && player.pos.x > 1 && player.pos.y > 1) {
         if (!tile_solid[mapidx(player.pos.x-1, player.pos.y-1)]) {
-            --player.pos.y;
-            --player.pos.x;
-            player_moved = true;
+            if (!check_attack(player.pos.x - 1, player.pos.y - 1)) {
+                --player.pos.y;
+                --player.pos.x;
+                player_moved = true;
+            }
         } else {
             position_t dest = player.pos;
             --dest.y;
@@ -220,9 +273,11 @@ void play_mode_t::do_turn(input_type_t &input) {
         }
     } else if (input == UPRIGHT && player.pos.x < level_width-1 && player.pos.y > 1) {
         if (!tile_solid[mapidx(player.pos.x+1, player.pos.y-1)]) {
-            --player.pos.y;
-            ++player.pos.x;
-            player_moved = true;
+            if (!check_attack(player.pos.x+1, player.pos.y-1)) {
+                --player.pos.y;
+                ++player.pos.x;
+                player_moved = true;
+            }
         } else {
             position_t dest = player.pos;
             --dest.y;
@@ -231,9 +286,11 @@ void play_mode_t::do_turn(input_type_t &input) {
         }
     } else if (input == DOWNLEFT && player.pos.x > 1 && player.pos.y < level_height-1) {
         if (!tile_solid[mapidx(player.pos.x-1, player.pos.y+1)]) {
-            ++player.pos.y;
-            --player.pos.x;
-            player_moved = true;
+            if (!check_attack(player.pos.x - 1, player.pos.y+1)) {
+                ++player.pos.y;
+                --player.pos.x;
+                player_moved = true;
+            }
         } else {
             position_t dest = player.pos;
             ++dest.y;
@@ -242,9 +299,11 @@ void play_mode_t::do_turn(input_type_t &input) {
         }
     } else if (input == DOWNRIGHT && player.pos.x < level_width-1 && player.pos.y < level_height-1) {
         if (!tile_solid[mapidx(player.pos.x+1, player.pos.y+1)]) {
-            ++player.pos.y;
-            ++player.pos.x;
-            player_moved = true;
+            if (!check_attack(player.pos.x+1, player.pos.y+1)) {
+                ++player.pos.y;
+                ++player.pos.x;
+                player_moved = true;
+            }
         } else {
             position_t dest = player.pos;
             ++dest.y;
@@ -276,6 +335,59 @@ void play_mode_t::do_turn(input_type_t &input) {
 
     // Update counters
     ++turn;
+
+    // Monsters
+    for (auto &mob : monsters) {
+        // Set to inactive
+        mob.second.active = false;
+
+        // If in range, can it see the player?
+        const float mob_range = rltk::distance2d(player.pos.x, player.pos.y, mob.second.pos.x, mob.second.pos.y);
+        if (mob_range < 10.0f) {
+            rltk::visibility_sweep_2d<position_t, navigator_t>(mob.second.pos, 8, [this, &mob] (position_t pos) {
+                // Hit tile
+                if (pos.x == this->player.pos.x && pos.y == this->player.pos.y) {
+                    mob.second.active = true;
+                }
+            }, [this] (position_t pos) {
+                // Is solid
+                if (pos.x > 0 && pos.x < level_width && pos.y > 0 && pos.y < level_height) {
+                    return !tile_solid[this->mapidx(pos.x, pos.y)]; 
+                } else {
+                    return true;
+                }
+            });
+        }
+
+        // Are we active?
+        if (mob.second.active) {
+            if (mob_range < 1.5f) {
+                // Adjacent - attack!
+                switch (mob.second.type) {
+                    case KOBOLD : { 
+                        log_entry("The kobold pokes you with a sharp stick (1 HP damage).");
+                        --player.hit_points;
+                    } break;
+                    case ORC : { 
+                        log_entry("The orc slices you with a rusty sword (3 HP damage).");
+                        player.hit_points -= 3;
+                    } break;
+                    case DRAGON : { 
+                        log_entry("The dragon swallows you whole.");
+                        player.hit_points -= 100;
+                    } break;
+                }
+            } else {
+                position_t dest = mob.second.pos;
+                if (mob.second.pos.x < player.pos.x) ++dest.x;
+                if (mob.second.pos.x > player.pos.x) --dest.x;
+                if (mob.second.pos.y < player.pos.y) ++dest.y;
+                if (mob.second.pos.y > player.pos.y) --dest.y;
+                const int mobidx = mapidx(dest.x, dest.y);
+                if (!tile_solid[mobidx]) mob.second.pos = dest;
+            }
+        }
+    }
 
     // Check for pick-ups
     if (tile_render[mapidx(player.pos.x, player.pos.y)].glyph == 236) {
@@ -359,6 +471,13 @@ void play_mode_t::render_map(window_t * win) {
                             win->set(screen_x, screen_y, 241, 0, 255, 0);
                         }
                     }
+                    
+                    for (const auto &mob : monsters) {
+                        if (mob.second.pos.x == x && mob.second.pos.y == y) {
+                            win->set(screen_x, screen_y, mob.second.glyph, mob.second.r, mob.second.g, mob.second.b);
+                        }
+                    }
+                    
                     if (x == player.pos.x && y == player.pos.y) {
                         win->set(screen_x, screen_y, '@', 255, 255, 0);
                     }
