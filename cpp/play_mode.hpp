@@ -4,8 +4,10 @@
 #include "level.hpp"
 #include "components/player.hpp"
 #include "components/item.hpp"
+#include "components/trap.hpp"
 #include <vector>
 #include <string>
+#include <map>
 
 enum input_type_t { NONE, LEFT, RIGHT, UP, DOWN, WAIT, UPLEFT, DOWNLEFT, UPRIGHT, DOWNRIGHT };
 
@@ -31,12 +33,15 @@ private:
 
     void set_floor(const int &idx);
     void set_door(const int &idx);
+    void set_pit_trap(const int &idx, const int &x, const int &y);
+    void set_blade_trap(const int &idx, const int &x, const int &y);
     void set_iron_key(const int &idx);
     void set_gold_key(const int &idx);
     bool is_solid(const uint8_t &glyph);
 
     player_t player;
     item_t amulet;
+    std::map<int, trap_t> traps;
 
     void cast_visibility();
     void render_map(window_t * win);

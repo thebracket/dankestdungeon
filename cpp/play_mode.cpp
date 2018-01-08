@@ -42,11 +42,9 @@ play_mode_t::play_mode_t(const level_t * level) {
             set_floor(i);
             // TODO: Dragon
         } else if (tile_render[i].glyph == 127) {
-            set_floor(i);
-            // TODO: Pit trap
+            set_pit_trap(i, x, y);
         } else if (tile_render[i].glyph == 241) {
-            set_floor(i);
-            // TODO: Blade trap
+            set_blade_trap(i, x, y);
         } else if (tile_render[i].glyph == 205) {
             set_floor(i);
             // TODO: Map scroll
@@ -76,6 +74,24 @@ void play_mode_t::set_floor(const int &idx) {
     tile_render[idx].r = 128;
     tile_render[idx].g = 128;
     tile_render[idx].b = 128;
+}
+
+void play_mode_t::set_pit_trap(const int &idx, const int &x, const int &y) {
+    tile_render[idx].glyph = '.';
+    tile_render[idx].r = 128;
+    tile_render[idx].g = 128;
+    tile_render[idx].b = 128;
+    trap_t newtrap{ PIT, false, position_t{static_cast<uint8_t>(x), static_cast<uint8_t>(y)}};
+    traps.insert(std::make_pair(idx, newtrap));
+}
+
+void play_mode_t::set_blade_trap(const int &idx, const int &x, const int &y) {
+    tile_render[idx].glyph = '.';
+    tile_render[idx].r = 128;
+    tile_render[idx].g = 128;
+    tile_render[idx].b = 128;
+    trap_t newtrap{ BLADE, false, position_t{static_cast<uint8_t>(x), static_cast<uint8_t>(y)}};
+    traps.insert(std::make_pair(idx, newtrap));
 }
 
 void play_mode_t::set_door(const int &idx) {
@@ -235,10 +251,28 @@ void play_mode_t::do_turn(input_type_t &input) {
             ++dest.x;
             collide(dest);
         }
+    } else if (input == WAIT) {
+        for (auto &trap : traps) {
+            if (tile_visible[mapidx(trap.second.pos.x, trap.second.pos.y)]) {
+                trap.second.revealed = true;
+                log_entry("You spotted a trap!");
+            }
+        }
     }
 
     // Redo visibility after movement
-    if (player_moved) cast_visibility();
+    if (player_moved) {
+        cast_visibility();
+        const int idx = mapidx(player.pos.x, player.pos.y);
+        auto finder = traps.find(idx);
+        if (finder != traps.end()) {
+            player.hit_points -= 3;
+            switch (finder->second.type) {
+                case PIT : log_entry("You stumble into a pit trap, taking 3 points of damage."); break;
+                case BLADE : log_entry("Snickety snick! Blades shoot out of the floor, hitting you for 3 points of damage."); break;
+            }
+        }
+    }
 
     // Update counters
     ++turn;
@@ -314,11 +348,19 @@ void play_mode_t::render_map(window_t * win) {
                     }
                     win->set(screen_x, screen_y, glyph, r, g, b);
 
-                    if (x == player.pos.x && y == player.pos.y) {
-                        win->set(screen_x, screen_y, '@', 255, 255, 0);
-                    }
                     if (x == amulet.pos.x && y == amulet.pos.y) {
                         win->set(screen_x, screen_y, 157, 0, 255, 0);
+                    }
+                    auto trapfinder = traps.find(idx);
+                    if (trapfinder != traps.end() && trapfinder->second.revealed) {
+                        if (trapfinder->second.type == PIT) {
+                            win->set(screen_x, screen_y, 127, 0, 255, 0);
+                        } else if (trapfinder->second.type == BLADE) {
+                            win->set(screen_x, screen_y, 241, 0, 255, 0);
+                        }
+                    }
+                    if (x == player.pos.x && y == player.pos.y) {
+                        win->set(screen_x, screen_y, '@', 255, 255, 0);
                     }
                 }
             }
