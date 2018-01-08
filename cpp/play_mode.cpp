@@ -172,6 +172,50 @@ void play_mode_t::do_turn(input_type_t &input) {
             ++dest.y;
             collide(dest);
         }
+    } else if (input == UPLEFT && player.pos.x > 1 && player.pos.y > 1) {
+        if (!tile_solid[mapidx(player.pos.x-1, player.pos.y-1)]) {
+            --player.pos.y;
+            --player.pos.x;
+            player_moved = true;
+        } else {
+            position_t dest = player.pos;
+            --dest.y;
+            --dest.x;
+            collide(dest);
+        }
+    } else if (input == UPRIGHT && player.pos.x < level_width-1 && player.pos.y > 1) {
+        if (!tile_solid[mapidx(player.pos.x+1, player.pos.y-1)]) {
+            --player.pos.y;
+            ++player.pos.x;
+            player_moved = true;
+        } else {
+            position_t dest = player.pos;
+            --dest.y;
+            ++dest.x;
+            collide(dest);
+        }
+    } else if (input == DOWNLEFT && player.pos.x > 1 && player.pos.y < level_height-1) {
+        if (!tile_solid[mapidx(player.pos.x-1, player.pos.y+1)]) {
+            ++player.pos.y;
+            --player.pos.x;
+            player_moved = true;
+        } else {
+            position_t dest = player.pos;
+            ++dest.y;
+            --dest.x;
+            collide(dest);
+        }
+    } else if (input == DOWNRIGHT && player.pos.x < level_width-1 && player.pos.y < level_height-1) {
+        if (!tile_solid[mapidx(player.pos.x+1, player.pos.y+1)]) {
+            ++player.pos.y;
+            ++player.pos.x;
+            player_moved = true;
+        } else {
+            position_t dest = player.pos;
+            ++dest.y;
+            ++dest.x;
+            collide(dest);
+        }
     }
 
     // Redo visibility after movement

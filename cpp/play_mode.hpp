@@ -6,7 +6,7 @@
 #include "components/item.hpp"
 #include <vector>
 
-enum input_type_t { NONE, LEFT, RIGHT, UP, DOWN, WAIT };
+enum input_type_t { NONE, LEFT, RIGHT, UP, DOWN, WAIT, UPLEFT, DOWNLEFT, UPRIGHT, DOWNRIGHT };
 
 struct input_map_t {
     int code;
@@ -62,6 +62,19 @@ private:
         { SDLK_DOWN, DOWN },
         { SDLK_k, DOWN },
         { SDLK_KP_2, DOWN },
+
+        { SDLK_KP_9, UPRIGHT},
+        { SDLK_u, UPRIGHT},
+
+        { SDLK_KP_7, UPLEFT},
+        { SDLK_y, UPLEFT},
+
+        { SDLK_KP_1, DOWNLEFT},
+        { SDLK_b, DOWNLEFT},
+
+        { SDLK_KP_3, DOWNRIGHT},
+        { SDLK_n, DOWNRIGHT},
+
 
         { SDLK_PERIOD, WAIT },
         { SDLK_KP_DECIMAL, WAIT }
