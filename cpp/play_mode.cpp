@@ -43,11 +43,15 @@ play_mode_t::play_mode_t(const level_t * level) {
         } else if (tile_render[i].glyph == 241) {
             set_blade_trap(i, x, y);
         } else if (tile_render[i].glyph == 205) {
-            set_floor(i);
-            // TODO: Map scroll
+            tile_render[i].glyph = 205;
+            tile_render[i].r = 0;
+            tile_render[i].g = 255;
+            tile_render[i].b = 0;
         } else if (tile_render[i].glyph == 229) {
-            set_floor(i);
-            // TODO: Healing potion
+            tile_render[i].glyph = 229;
+            tile_render[i].r = 0;
+            tile_render[i].g = 255;
+            tile_render[i].b = 0;
         }
 
         // Other info
@@ -118,6 +122,8 @@ bool play_mode_t::is_solid(const uint8_t &glyph) {
         case '.': return false;
         case 236 : return false;
         case 237 : return false;
+        case 229 : return false;
+        case 205 : return false;
         case '~': return true;
         default: return true;
     }
@@ -398,6 +404,16 @@ void play_mode_t::do_turn(input_type_t &input) {
     if (tile_render[mapidx(player.pos.x, player.pos.y)].glyph == 237) {
         log_entry("You pick up the gold key.");
         player.has_gold_key = true;
+        set_floor(mapidx(player.pos.x, player.pos.y));
+    }
+    if (tile_render[mapidx(player.pos.x, player.pos.y)].glyph == 229) {
+        log_entry("You drink a lovely healing potion. It tastes of flower petals.");
+        player.hit_points += 10;
+        set_floor(mapidx(player.pos.x, player.pos.y));
+    }
+    if (tile_render[mapidx(player.pos.x, player.pos.y)].glyph == 205) {
+        log_entry("You read the map of the entire dungeon, and commit it to memory.");
+        std::fill(tile_revealed.begin(), tile_revealed.end(), true);
         set_floor(mapidx(player.pos.x, player.pos.y));
     }
 
