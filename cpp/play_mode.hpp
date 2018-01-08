@@ -3,9 +3,10 @@
 #include "rltk/base_mode.hpp"
 #include "level.hpp"
 #include "components/player.hpp"
+#include "components/item.hpp"
 #include <vector>
 
-enum input_type_t { NONE, LEFT, RIGHT, UP, DOWN };
+enum input_type_t { NONE, LEFT, RIGHT, UP, DOWN, WAIT };
 
 struct input_map_t {
     int code;
@@ -28,14 +29,17 @@ private:
     std::array<bool, level_tiles> tile_visible;
 
     void set_floor(const int &idx);
+    void set_door(const int &idx);
     bool is_solid(const uint8_t &glyph);
 
     player_t player;
+    item_t amulet;
 
     void cast_visibility();
     void render_map(window_t * win);
     void handle_input(window_t * win);
     void do_turn(input_type_t &input);
+    void collide(const position_t &pos);
 
     inline int mapidx(const int &x, const int &y) {
         return (y * level_width) + x;
@@ -57,6 +61,9 @@ private:
 
         { SDLK_DOWN, DOWN },
         { SDLK_k, DOWN },
-        { SDLK_KP_2, DOWN }
+        { SDLK_KP_2, DOWN },
+
+        { SDLK_PERIOD, WAIT },
+        { SDLK_KP_DECIMAL, WAIT }
     };
 };

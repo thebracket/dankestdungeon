@@ -19,7 +19,11 @@ play_mode_t::play_mode_t(const level_t * level) {
             player.pos.y = y;
         } else if (tile_render[i].glyph == 157) {
             set_floor(i);
-            // TODO: Amulet coordinates
+            amulet.name = "Amulet of Winning";
+            amulet.pos.x = x;
+            amulet.pos.y = y;
+        } else if (tile_render[i].glyph == '+') {
+            set_door(i); // Doors
         } else if (tile_render[i].glyph == 236) {
             set_floor(i);
             // TODO: Study Iron Key
@@ -69,6 +73,14 @@ void play_mode_t::set_floor(const int &idx) {
     tile_render[idx].r = 128;
     tile_render[idx].g = 128;
     tile_render[idx].b = 128;
+}
+
+void play_mode_t::set_door(const int &idx) {
+    tile_render[idx].glyph = '+';
+    tile_render[idx].r = 128;
+    tile_render[idx].g = 128;
+    tile_render[idx].b = 128;
+    tile_solid[idx] = true;
 }
 
 bool play_mode_t::is_solid(const uint8_t &glyph) {
@@ -129,33 +141,60 @@ void play_mode_t::do_turn(input_type_t &input) {
             --player.pos.x;
             player_moved = true;
         } else {
-            // Log a wall hit
+            position_t dest = player.pos;
+            --dest.x;
+            collide(dest);
         }
     } else if (input == RIGHT && player.pos.x < level_width - 1) {
         if (!tile_solid[mapidx(player.pos.x + 1, player.pos.y)]) {
             ++player.pos.x;
             player_moved = true;
         } else {
-            // Log a wall hit
+            position_t dest = player.pos;
+            ++dest.x;
+            collide(dest);
         }
     } else if (input == UP && player.pos.y > 1) {
         if (!tile_solid[mapidx(player.pos.x, player.pos.y-1)]) {
             --player.pos.y;
             player_moved = true;
         } else {
-            // Log a wall hit
+            position_t dest = player.pos;
+            --dest.y;
+            collide(dest);
         }
     } else if (input == DOWN && player.pos.y < level_height - 1) {
         if (!tile_solid[mapidx(player.pos.x, player.pos.y+1)]) {
             ++player.pos.y;
             player_moved = true;
         } else {
-            // Log a wall hit
+            position_t dest = player.pos;
+            ++dest.y;
+            collide(dest);
         }
     }
 
     // Redo visibility after movement
     if (player_moved) cast_visibility();
+
+    // Update counters
+    ++turn;
+
+    // Check for win/loss conditions
+    if (player.pos.x == amulet.pos.x && player.pos.y == amulet.pos.y) {
+        printf("Player was won the game in %d turns.\n", turn);
+    }
+}
+
+void play_mode_t::collide(const position_t &pos) {
+    const int idx = mapidx(pos.x, pos.y);
+    if (tile_render[idx].glyph == '+') {
+        tile_render[idx].glyph = '.';
+        tile_solid[idx] = false;
+        // TODO: Note opening the door
+    } else {
+        // TODO: Note the collision
+    }
 }
 
 void play_mode_t::render_map(window_t * win) {
@@ -184,6 +223,9 @@ void play_mode_t::render_map(window_t * win) {
 
                     if (x == player.pos.x && y == player.pos.y) {
                         win->set(screen_x, screen_y, '@', 255, 255, 0);
+                    }
+                    if (x == amulet.pos.x && y == amulet.pos.y) {
+                        win->set(screen_x, screen_y, 157, 0, 255, 0);
                     }
                 }
             }

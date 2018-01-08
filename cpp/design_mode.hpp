@@ -44,7 +44,7 @@ class design_mode_t : public game_mode_t {
         design_element_t{6, 230, 10, 238, "(T)oadstool", SDLK_t},
         design_element_t{5, 0, 255, 0, "(V)egetation", SDLK_p},
         design_element_t{'+', 128, 128, 128, "(D)oor - normal", SDLK_d},
-        design_element_t{'~', 0, 0, 255, "(W)ater", SDLK_w}
+        design_element_t{'~', 0, 0, 255, "(P)Pool", SDLK_p}
     };
     std::vector<design_element_t> special_elements = {
         design_element_t{'@', 255, 255, 0, "(P)layer", SDLK_p},
