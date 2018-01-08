@@ -6,6 +6,7 @@
 
 play_mode_t::play_mode_t(const level_t * level) {
     // Playtest constructor - copy the level to the playable format.
+    playtesting = true;
 
     int x = 0;
     int y = 0;
@@ -173,7 +174,7 @@ bool play_mode_t::tick(window_t * win) {
     handle_input(win);
 
     // Temporary: DELETEME when exit conditions work.
-    if (win->is_key_down(SDLK_ESCAPE)) {
+    if (playtesting && win->is_key_down(SDLK_ESCAPE)) {
         return true;
     }
     return false;
@@ -505,21 +506,26 @@ void play_mode_t::render_map(window_t * win) {
     }
 
     const int term_left = terminal_width - 30;
-    win->print(term_left, 0, "Dungeon Title");
-    win->print(term_left, 2, std::string("Turn: ") + std::to_string(turn), 128, 128, 128);
-    win->print(term_left, 3, std::string("HP: ") + std::to_string(player.hit_points), 128, 128, 128);
-    win->set(term_left, 5, 157, 0, 255, 0);
-    win->print(term_left+2, 5, "Find the Amulet of Winning", 128, 128, 128);
-    win->print(term_left, 6, "Move with cursor keys,", 128, 128, 128);
-    win->print(term_left, 7, "Numeric Keypad,", 128, 128, 128);
-    win->print(term_left, 8, "or VI keys", 128, 128, 128);
-    win->print(term_left, 9, ". Wait/Look for traps", 128, 128, 128);
+    if (playtesting) {
+        win->print(term_left, 0, "Prove dungeon is beatable!");
+        win->print(term_left, 1, "ESCape back to the drawing board", 128, 128, 128);
+    } else {
+        win->print(term_left, 0, "Dungeon Title");
+    }
+    win->print(term_left, 3, std::string("Turn: ") + std::to_string(turn), 128, 128, 128);
+    win->print(term_left, 4, std::string("HP: ") + std::to_string(player.hit_points), 128, 128, 128);
+    win->set(term_left, 6, 157, 0, 255, 0);
+    win->print(term_left+2, 6, "Find the Amulet of Winning", 128, 128, 128);
+    win->print(term_left, 7, "Move with cursor keys,", 128, 128, 128);
+    win->print(term_left, 8, "Numeric Keypad,", 128, 128, 128);
+    win->print(term_left, 9, "or VI keys", 128, 128, 128);
+    win->print(term_left, 10, ". Wait/Look for traps", 128, 128, 128);
 
     if (player.has_iron_key) {
-        win->print(term_left, 11, "You have the iron key");
+        win->print(term_left, 12, "You have the iron key");
     }
     if (player.has_gold_key) {
-        win->print(term_left, 12, "You have the gold key");
+        win->print(term_left, 13, "You have the gold key");
     }
 
     int y = terminal_height - 6;
