@@ -1,4 +1,6 @@
 #include "design_mode.hpp"
+#include "play_mode.hpp"
+#include "modestack.hpp"
 #include <algorithm>
 
 bool design_mode_t::tick(window_t * win) {
@@ -127,6 +129,19 @@ void design_mode_t::render_ui(window_t * win) {
                 if (win->mouse_y == 8) mode = PERKS;
             }
     }
+
+    win->print(panel_left, terminal_height-1, "Playtest >>>", 0, 255, 0);
+    if (win->clicked) {
+            if (win->mouse_x > terminal_width - 20) {
+                if (win->mouse_y == terminal_height - 1) {
+                    modestack.emplace(std::make_unique<play_mode_t>(&level));
+                }
+            }
+    }
+    if (win->is_key_down(SDLK_PERIOD)) {
+        modestack.emplace(std::make_unique<play_mode_t>(&level));
+    }
+    
 }
 
 void design_mode_t::render_submenu(window_t * win, std::vector<design_element_t> * elements) {
