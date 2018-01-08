@@ -422,6 +422,9 @@ void play_mode_t::do_turn(input_type_t &input) {
     if (player.pos.x == amulet.pos.x && player.pos.y == amulet.pos.y) {
         printf("Player was won the game in %d turns.\n", turn);
     }
+    if (player.hit_points < 1) {
+        printf("Player is dead\n");
+    }
 }
 
 void play_mode_t::collide(const position_t &pos) {
