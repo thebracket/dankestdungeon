@@ -61,6 +61,12 @@ void design_mode_t::render_map(window_t * win) {
     if (found_player > 1) win->print_center(terminal_height - 2, "Map must have only one player", 255, 0, 0);
     if (found_amulet == 0) win->print_center(terminal_height - 1, "Map must include the amulet of winning!", 255, 0, 0);
     if (found_amulet > 1) win->print_center(terminal_height - 1, "Map must have only one amulet of winning!", 255, 0, 0);
+
+    if (game_exit_state == DEAD) {
+        win->print_center(0, "Last attempt at the dungeon resulted in painful death! Tweak and try again.", 255, 0, 0);
+    } else if (game_exit_state == WON) {
+        win->print_center(0, "You have beaten the dungeon - press ESC to publish.", 0, 255, 0);        
+    }
 }
 
 void design_mode_t::render_ui(window_t * win) {
@@ -210,6 +216,7 @@ void design_mode_t::handle_inputs(window_t * win) {
                 level.tiles[idx].r = paint_r;
                 level.tiles[idx].g = paint_g;
                 level.tiles[idx].b = paint_b;
+                game_exit_state = IN_PROGRESS;
             }
         }
     }

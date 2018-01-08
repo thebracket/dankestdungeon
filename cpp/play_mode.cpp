@@ -3,10 +3,13 @@
 #include "components/position.hpp"
 #include <algorithm>
 #include <vector>
+#include "modestack.hpp"
 
 play_mode_t::play_mode_t(const level_t * level) {
     // Playtest constructor - copy the level to the playable format.
     playtesting = true;
+    game_exit_state = IN_PROGRESS;
+    game_exit_turns = 0;
 
     int x = 0;
     int y = 0;
@@ -177,6 +180,20 @@ bool play_mode_t::tick(window_t * win) {
     if (playtesting && win->is_key_down(SDLK_ESCAPE)) {
         return true;
     }
+        // Check for win/loss conditions
+    if (player.pos.x == amulet.pos.x && player.pos.y == amulet.pos.y) {
+        printf("Player was won the game in %d turns.\n", turn);
+        game_exit_state = WON;
+        game_exit_turns = turn;
+        return true;
+    }
+    if (player.hit_points < 1) {
+        printf("Player is dead\n");
+        game_exit_state = DEAD;
+        game_exit_turns = turn;
+        return true;
+    }
+
     return false;
 }
 
@@ -416,14 +433,6 @@ void play_mode_t::do_turn(input_type_t &input) {
         log_entry("You read the map of the entire dungeon, and commit it to memory.");
         std::fill(tile_revealed.begin(), tile_revealed.end(), true);
         set_floor(mapidx(player.pos.x, player.pos.y));
-    }
-
-    // Check for win/loss conditions
-    if (player.pos.x == amulet.pos.x && player.pos.y == amulet.pos.y) {
-        printf("Player was won the game in %d turns.\n", turn);
-    }
-    if (player.hit_points < 1) {
-        printf("Player is dead\n");
     }
 }
 
