@@ -51,9 +51,9 @@ class design_mode_t : public game_mode_t {
         design_element_t{157, 0, 255, 0, "(A)mulet of Winning", SDLK_a}
     };
     std::vector<design_element_t> puzzle_elements = {
-        design_element_t{'+', 255, 255, 255, "(I)ron Door - Locked", SDLK_i},
+        design_element_t{'!', 255, 255, 255, "(I)ron Door, Locked", SDLK_i},
         design_element_t{236, 255, 255, 255, "(O)Iron Key", SDLK_o},
-        design_element_t{240, 255, 255, 0, "(G)old Door - Locked", SDLK_g},
+        design_element_t{240, 255, 255, 0, "(G)old Door, Locked", SDLK_g},
         design_element_t{237, 255, 255, 0, "(H)Gold Key", SDLK_h},
     };
     std::vector<design_element_t> mob_elements = {

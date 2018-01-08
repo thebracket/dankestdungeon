@@ -25,11 +25,13 @@ play_mode_t::play_mode_t(const level_t * level) {
         } else if (tile_render[i].glyph == '+') {
             set_door(i); // Doors
         } else if (tile_render[i].glyph == 236) {
-            set_floor(i);
-            // TODO: Study Iron Key
+            set_iron_key(i);
+        } else if (tile_render[i].glyph == '!') {
+            // TODO: Iron Door
+        } else if (tile_render[i].glyph == 237) {
+            set_gold_key(i);
         } else if (tile_render[i].glyph == 240) {
-            set_floor(i);
-            // TODO: Gold Key
+            // TODO: Gold Door
         } else if (tile_render[i].glyph == 'k') {
             set_floor(i);
             // TODO: Kobold
@@ -66,6 +68,7 @@ play_mode_t::play_mode_t(const level_t * level) {
     }
 
     cast_visibility();
+    log_entry("Welcome to the dungeon, we've got fun and games...");
 }
 
 void play_mode_t::set_floor(const int &idx) {
@@ -83,9 +86,25 @@ void play_mode_t::set_door(const int &idx) {
     tile_solid[idx] = true;
 }
 
+void play_mode_t::set_iron_key(const int &idx) {
+    tile_render[idx].glyph = 236;
+    tile_render[idx].r = 255;
+    tile_render[idx].g = 255;
+    tile_render[idx].b = 255;
+}
+
+void play_mode_t::set_gold_key(const int &idx) {
+    tile_render[idx].glyph = 237;
+    tile_render[idx].r = 255;
+    tile_render[idx].g = 255;
+    tile_render[idx].b = 0;
+}
+
 bool play_mode_t::is_solid(const uint8_t &glyph) {
     switch (glyph) {
         case '.': return false;
+        case 236 : return false;
+        case 237 : return false;
         case '~': return true;
         default: return true;
     }
@@ -224,6 +243,18 @@ void play_mode_t::do_turn(input_type_t &input) {
     // Update counters
     ++turn;
 
+    // Check for pick-ups
+    if (tile_render[mapidx(player.pos.x, player.pos.y)].glyph == 236) {
+        log_entry("You pick up the iron key.");
+        player.has_iron_key = true;
+        set_floor(mapidx(player.pos.x, player.pos.y));
+    }
+    if (tile_render[mapidx(player.pos.x, player.pos.y)].glyph == 237) {
+        log_entry("You pick up the gold key.");
+        player.has_gold_key = true;
+        set_floor(mapidx(player.pos.x, player.pos.y));
+    }
+
     // Check for win/loss conditions
     if (player.pos.x == amulet.pos.x && player.pos.y == amulet.pos.y) {
         printf("Player was won the game in %d turns.\n", turn);
@@ -235,21 +266,39 @@ void play_mode_t::collide(const position_t &pos) {
     if (tile_render[idx].glyph == '+') {
         tile_render[idx].glyph = '.';
         tile_solid[idx] = false;
-        // TODO: Note opening the door
+        log_entry("With a creak, the waterlogged door swings open. That's not closing again.");
+    } else if (tile_render[idx].glyph == '!') {
+        if (player.has_iron_key) {
+            tile_render[idx].glyph = '.';
+            tile_solid[idx] = false;
+            player.has_iron_key = false;
+            log_entry("You unlock the iron door with the iron key. It slides into the floor.");
+        } else {
+            log_entry("This door is solid iron, and requires the iron key to open.");
+        }
+    } else if (tile_render[idx].glyph == 240) {
+        if (player.has_gold_key) {
+            tile_render[idx].glyph = '.';
+            tile_solid[idx] = false;
+            player.has_gold_key = false;
+            log_entry("You unlock the gold door with the gold key. It slides into the floor.");
+        } else {
+            log_entry("This door is solid gold, and requires the gold key to open.");
+        }
     } else {
-        // TODO: Note the collision
+        log_entry("Ouch! That's a solid wall!");
     }
 }
 
 void play_mode_t::render_map(window_t * win) {
     // Map render
     win->cls();
-    const int left_x = std::max(0, player.pos.x - (terminal_width/2));
+    const int left_x = std::max(0, player.pos.x - (terminal_width/2)+15);
     const int top_y = std::max(0, player.pos.y - (terminal_height/2));
     int screen_y = 1;
     for (int y=top_y; y<top_y + terminal_height - 1; ++y) {
         int screen_x = 0;
-        for (int x=left_x; x<left_x + terminal_width - 20; ++x) {
+        for (int x=left_x; x<left_x + terminal_width - 30; ++x) {
             if (x < level_width && y < level_height) {
                 const int idx = mapidx(x, y);
                 if (tile_revealed[idx]) {
@@ -277,4 +326,35 @@ void play_mode_t::render_map(window_t * win) {
         }
         ++screen_y;
     }
+
+    const int term_left = terminal_width - 30;
+    win->print(term_left, 0, "Dungeon Title");
+    win->print(term_left, 2, std::string("Turn: ") + std::to_string(turn), 128, 128, 128);
+    win->print(term_left, 3, std::string("HP: ") + std::to_string(player.hit_points), 128, 128, 128);
+    win->set(term_left, 5, 157, 0, 255, 0);
+    win->print(term_left+2, 5, "Find the Amulet of Winning", 128, 128, 128);
+    win->print(term_left, 6, "Move with cursor keys,", 128, 128, 128);
+    win->print(term_left, 7, "Numeric Keypad,", 128, 128, 128);
+    win->print(term_left, 8, "or VI keys", 128, 128, 128);
+    win->print(term_left, 9, ". Waits", 128, 128, 128);
+
+    if (player.has_iron_key) {
+        win->print(term_left, 11, "You have the iron key");
+    }
+    if (player.has_gold_key) {
+        win->print(term_left, 12, "You have the gold key");
+    }
+
+    int y = terminal_height - 6;
+    for (int i=0; i<5; ++i) {
+        win->print(1, y + i, log[i], 128, 128, 128);
+    }
+}
+
+void play_mode_t::log_entry(std::string msg) {
+    log[4] = log[3];
+    log[3] = log[2];
+    log[2] = log[1];
+    log[1] = log[0];
+    log[0] = msg;
 }

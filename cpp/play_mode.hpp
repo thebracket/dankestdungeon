@@ -5,6 +5,7 @@
 #include "components/player.hpp"
 #include "components/item.hpp"
 #include <vector>
+#include <string>
 
 enum input_type_t { NONE, LEFT, RIGHT, UP, DOWN, WAIT, UPLEFT, DOWNLEFT, UPRIGHT, DOWNRIGHT };
 
@@ -30,6 +31,8 @@ private:
 
     void set_floor(const int &idx);
     void set_door(const int &idx);
+    void set_iron_key(const int &idx);
+    void set_gold_key(const int &idx);
     bool is_solid(const uint8_t &glyph);
 
     player_t player;
@@ -44,6 +47,12 @@ private:
     inline int mapidx(const int &x, const int &y) {
         return (y * level_width) + x;
     }
+
+    std::vector<std::string> log{
+        "", "", "", "", ""
+    };
+
+    void log_entry(std::string msg);
 
     /* Quick input mapper. In a real app, this would be adjustable! */
     std::vector<input_map_t> input_mapper {
@@ -74,7 +83,6 @@ private:
 
         { SDLK_KP_3, DOWNRIGHT},
         { SDLK_n, DOWNRIGHT},
-
 
         { SDLK_PERIOD, WAIT },
         { SDLK_KP_DECIMAL, WAIT }
