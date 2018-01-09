@@ -3,6 +3,7 @@
 #include "design_mode.hpp"
 #include "play_mode.hpp"
 #include "modestack.hpp"
+#include "level_select.hpp"
 
 bool main_menu_t::tick(window_t * win) {
     const std::string title = std::string("Welcome to Dankest Dungeon");
@@ -52,7 +53,7 @@ void main_menu_t::launch_item(const int code) {
             modestack.emplace(std::make_unique<design_mode_t>());
         } break;
         case 2 : {
-            modestack.emplace(std::make_unique<play_mode_t>());
+            modestack.emplace(std::make_unique<level_select_t>());
         } break;
         case 3 : {
             modestack.emplace(std::make_unique<leaderboards_t>());

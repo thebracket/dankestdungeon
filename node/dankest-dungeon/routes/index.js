@@ -100,3 +100,16 @@ router.post("/api/SaveDungeon", (req, res, next) => {
     });
   });
 });
+
+router.get("/api/DungeonList", (req, res, next) => {
+  let db = require("./database");
+  db.doSql("SELECT dungeons.id AS id, name, username FROM dungeons INNER JOIN adventurers a ON dungeons.adventurer_id = a.id;", [], (rows) => {
+    let result = "";
+    for (var i=0; i<rows.length; ++i) {
+      result += rows[i].id + "\n";
+      result += rows[i].name + "\n";
+      result += rows[i].username + "\n";
+    }
+    res.json(result);
+  });
+});
