@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dankest Dungeon 1.0 - A 7 Day Bracket Production</title>
+        <link rel="stylesheet" type="text/css" href="stylesheets/dank.css">
+        <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-44498023-7"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-44498023-7');
+        </script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+        <script type="text/javascript" src="javascripts/md5.js"></script>
+        <script type="text/javascript" src="javascripts/login.js"></script>
+
+    </head>
+    <body class="crt" onload="setup()">
+        <div id="body">
+            <h1>Dankest Dungeon 1.0</h1>
+
+            <p style="font-size: 14pt">Dismayed by the state of politics in the land of Yonder, you decided to research political
+                science. With no source material available beyond the sacred texts of <i>Vulpes Nuntium</i>,
+                you conclude that only the dankest of memes can be used to win back sanity in your lands. Since
+                dank things are generally found underground, you set forth into the <i>Dankest Dungeon</i>,
+                seeking to find the <i>Amulet of Winning</i> - and restore political sanity to the land.
+            </p>
+
+            <p style="font-style: italic">
+                This is a 7-Day Roguelike, created as an exercise in finding out what <a href="https://github.com/kripken/emscripten">Emscripten</a>
+                can do these days. Please enjoy it, and provide feedback to /u/thebracket on Reddit. This program is
+                provided as-is. No warranty, express or implied, is provided. Any resemblance to real-life characters
+                is purely coincidental. In other words - have fun, please don't sue me, and remember that this was
+                written for fun not security - so please don't give me any secrets to protect!
+            </p>
+
+            <h2>Brave Adventurer - Identify Yourself!</h2>
+            <p>This game is built around designing dungeons, and sharing them with other adventurers. As such, you
+                need a user account - so we know which dungeons are yours. Very little effort has been put into
+                security, so please don't use a password that you care about, or use for anything important!
+            </p>
+            <fieldset>
+                <legend>Returning Adventurer Login:</legend>
+                <label for="username">Username: </label>
+                <input type="text" id="username" size="15" />
+                <label for="password">Password: </label>
+                <input type="password" id="password" />
+                <input type="button" id="loginBtn" value="Login >>>" />
+            </fieldset>
+            <fieldset>
+                    <legend>New Adventurer Login:</legend>
+                    <label for="nusername">Username: </label>
+                    <input type="text" id="nusername" size="15" />
+                    <label for="npassword">Password: </label>
+                    <input type="password" id="npassword" />
+                    <label for="npassword2">Password Again, in case you type as badly as me: </label>
+                    <input type="password" id="npassword2" />
+                    <input type="button" id="newUserBtn" value="Create Account >>>" />
+                </fieldset>
+        </div>
+
+        <div id="footer">
+            <p style="text-align: center">
+                <em>Copyright &copy; 2018 <a href="http://bracketproductions.com/">Bracket Productions</a>.</em>
+                Source code (MIT License) available <a href="https://github.com/thebracket/dankestdungeon">on GitHub</a>.
+            </p>
+        </div>
+    </body>
+</html>

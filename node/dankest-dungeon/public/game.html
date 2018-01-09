@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dankest Dungeon 1.0 - A 7 Day Bracket Production</title>
+        <link rel="stylesheet" type="text/css" href="stylesheets/dank.css">
+        <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-44498023-7"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-44498023-7');
+        </script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+        <script type="text/javascript" src="javascripts/game.js"></script>
+    </head>
+    <body class="crt" onload="setup()">
+        <div id="body">
+            <p>
+                Welcome, <span style="color: yellow" id="greeting"></span>. Can you build the Dankest Dungeon?
+            </p>
+
+            <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" width="1280" height="640" style="cursor: default;"></canvas>
+
+        </div>
+
+        <div id="footer">
+            <p style="text-align: center">
+                <em>Copyright &copy; 2018 <a href="http://bracketproductions.com/">Bracket Productions</a>.</em>
+                Source code (MIT License) available <a href="https://github.com/thebracket/dankestdungeon">on GitHub</a>.
+            </p>
+        </div>
+        <script type="text/javascript">
+            var Module = {
+                print: (function() {
+                var element = document.getElementById('output');
+                return function(text) {
+                    element.innerHTML += text.replace('\n', '<br>', 'g') + '<br>';
+                };
+                })(),
+                canvas: document.getElementById('canvas')
+                };
+    </script>
+        <script type="text/javascript" src="dankest.js"></script>
+    </body>
+</html>

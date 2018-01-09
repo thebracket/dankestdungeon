@@ -2,6 +2,7 @@
 #include "play_mode.hpp"
 #include "modestack.hpp"
 #include <algorithm>
+#include <emscripten.h>
 
 bool design_mode_t::tick(window_t * win) {
     win->cls();
@@ -16,7 +17,28 @@ bool design_mode_t::tick(window_t * win) {
     render_ui(win);
     handle_inputs(win);
 
-    if (win->is_key_down(SDLK_ESCAPE)) {
+    if (win->is_key_down(SDLK_ESCAPE) && game_exit_state == WON) {
+        // Build it into a persistent format
+        std::string level_data = "";
+        for (int i=0; i<level_tiles; ++i) {
+            level_data += level.tiles[i].glyph;
+            level_data += level.tiles[i].r;
+            level_data += level.tiles[i].g;
+            level_data += level.tiles[i].b;
+        }
+
+        // We need to title the dungeon
+        EM_ASM(
+            var level_data = Pointer_stringify($0);
+            var dungeonName = "";
+            while (dungeonName == "") {
+                dungeonName = prompt("Please name your dungeon", localStorage.getItem("dankest_user") + "'s Dungeon");
+            }
+            saveLevel(dungeonName, level_data);
+        , level_data.c_str());
+
+        // Post it to the server
+        // Break out!
         return true;
     }
     return false;

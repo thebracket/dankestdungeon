@@ -520,7 +520,7 @@ void play_mode_t::render_map(window_t * win) {
     const int term_left = terminal_width - 30;
     if (playtesting) {
         win->print(term_left, 0, "Prove dungeon is beatable!");
-        win->print(term_left, 1, "ESCape back to the drawing board", 128, 128, 128);
+        win->print(term_left, 1, "ESCape back to the designer", 128, 128, 128);
     } else {
         win->print(term_left, 0, "Dungeon Title");
     }

@@ -11,6 +11,7 @@ bool main_menu_t::tick(window_t * win) {
     win->cls();
     win->box(bx, 4, title.size()+1, 4, 255, 255, 255, true);
     win->print_center(5, "Welcome to Dankest Dungeon", 255, 255, 0);
+    win->print_center(6, username);
     win->print_center(7, "A 7-Day Bracket Production", 255, 0, 255);
     win->print_center(terminal_height-2, "(c) 2018 Bracket Productions", 0, 0, 255);
 
