@@ -55,8 +55,5 @@ void main_menu_t::launch_item(const int code) {
         case 2 : {
             modestack.emplace(std::make_unique<level_select_t>());
         } break;
-        case 3 : {
-            modestack.emplace(std::make_unique<leaderboards_t>());
-        } break;
     }
 }

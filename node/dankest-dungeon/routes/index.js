@@ -153,3 +153,22 @@ router.post("/api/SaveRunthrough", (req, res, next) => {
     });
   });
 });
+
+router.get("/api/Leaderboard", (req, res, next) => {
+  let db = require("./database");
+  const sqlCreators = "select username, count(adventurer_id) AS count FROM dungeons INNER JOIN adventurers ON dungeons.adventurer_id = adventurers.id GROUP BY username ORDER BY count DESC";
+  const topDungeons = "select name, round(avg(rating),1) AS rating FROM result INNER JOIN dungeons ON result.dungeon_id = dungeons.id GROUP BY name ORDER BY rating DESC;";
+  const frequentPlayers = "select username, count(*) FROM result INNER JOIN adventurers ON adventurers.id = result.adventurer_id GROUP BY username ORDER BY count DESC;";
+
+  let result = {};
+  db.doSql(sqlCreators, [], (creators) => {
+    result.creators = creators;
+    db.doSql(topDungeons, [], (topgun) => {      
+      result.topDungeons = topgun;
+      db.doSql(frequentPlayers, [], (freq) => {
+        result.frequent = freq;
+        res.json(result);
+      });
+    })
+  })
+});

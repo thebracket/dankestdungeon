@@ -14,16 +14,16 @@
         gtag('config', 'UA-44498023-7');
         </script>
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-        <script type="text/javascript" src="javascripts/game.js"></script>
+        <script type="text/javascript" src="javascripts/leaderboards.js"></script>
     </head>
     <body class="crt" onload="setup()">
         <div id="body">
             <p>
                 Welcome, <span style="color: yellow" id="greeting"></span>. Can you build the Dankest Dungeon?
-                <a href="leaderboards.html">View Leaderboards</a>
+                <a href="game.html">Play the Game</a>
             </p>
 
-            <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" width="1280" height="640" style="cursor: default;"></canvas>
+            <div id="boards"></div>
 
         </div>
 
@@ -33,17 +33,5 @@
                 Source code (MIT License) available <a href="https://github.com/thebracket/dankestdungeon">on GitHub</a>.
             </p>
         </div>
-        <script type="text/javascript">
-            var Module = {
-                print: (function() {
-                var element = document.getElementById('output');
-                return function(text) {
-                    element.innerHTML += text.replace('\n', '<br>', 'g') + '<br>';
-                };
-                })(),
-                canvas: document.getElementById('canvas')
-                };
-    </script>
-        <script type="text/javascript" src="dankest.js"></script>
     </body>
 </html>
