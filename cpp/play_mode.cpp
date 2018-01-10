@@ -193,12 +193,24 @@ bool play_mode_t::tick(window_t * win) {
         printf("Player was won the game in %d turns.\n", turn);
         game_exit_state = WON;
         game_exit_turns = turn;
+
+        if (!playtesting) {
+            EM_ASM(
+                winGame($0, $1);
+            , game_exit_turns, levelId);
+        }
+
         return true;
     }
     if (player.hit_points < 1) {
         printf("Player is dead\n");
         game_exit_state = DEAD;
         game_exit_turns = turn;
+
+        EM_ASM(
+            loseGame($0, $1);
+            , game_exit_turns, levelId);
+
         return true;
     }
 

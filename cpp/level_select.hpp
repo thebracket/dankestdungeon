@@ -9,4 +9,5 @@ class level_select_t : public game_mode_t {
     private:
     bool first_run = true;
     void get_levels();
+    int start = 0;
 };

@@ -81,9 +81,7 @@ bool level_select_t::tick(window_t * win) {
 
     win->cls();
     win->print_center(1, "Select Your Dungeon", 255, 255, 0);
-    win->print_center(2, "ESC to return to main menu", 128, 128, 128);
-
-    int start = 0;
+    win->print_center(2, "ESC to return to main menu (PgUp/PgDn for more)", 128, 128, 128);
 
     if (got_levels) {
         int count = 0;

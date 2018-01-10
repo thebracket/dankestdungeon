@@ -103,7 +103,8 @@ router.post("/api/SaveDungeon", (req, res, next) => {
 
 router.get("/api/DungeonList", (req, res, next) => {
   let db = require("./database");
-  db.doSql("SELECT dungeons.id AS id, name, username FROM dungeons INNER JOIN adventurers a ON dungeons.adventurer_id = a.id;", [], (rows) => {
+  const sql = "SELECT dungeons.id AS id, COALESCE(name||' (Rating: '||(SELECT round(avg(rating),1) FROM result WHERE dungeon_id=dungeons.id)||', Plays: '||(select count(rating) FROM result WHERE dungeon_id=dungeons.id)||', T'||(select round(avg(turns)) FROM result WHERE dungeon_id=dungeons.id)||')', name) AS name, username FROM dungeons INNER JOIN adventurers a ON dungeons.adventurer_id = a.id ORDER BY id DESC;";
+  db.doSql(sql, [], (rows) => {
     let result = "";
     for (var i=0; i<rows.length; ++i) {
       result += rows[i].id + "\n";
@@ -125,5 +126,30 @@ router.get("/api/Dungeon/:id", (req, res, next) => {
       //console.log(rows[0].level_data);
       res.json(rows[0].level_data);
     }
+  });
+});
+
+router.post("/api/SaveRunthrough", (req, res, next) => {
+  let db = require("./database");
+  let body = req.body;
+  let tokens = require("./tokens");
+  const token = body.token;
+  const levelId = body.levelId;
+  const turns = body.turns;
+  const result = body.result;
+  const rating = body.rating;
+  const isWin = result == "WIN" ? true : false;
+
+  tokens.expireTokens((r) => {
+    db.doSql("SELECT adventurer_id FROM tokens WHERE id=$1", [token], (tokenrows) => {
+      if (tokenrows.length != 1) {
+        res.json("Error - who are you?");
+      } else {
+        var userId = tokenrows[0].adventurer_id;
+        db.doSql("INSERT INTO result (dungeon_id, is_win, turns, rating, adventurer_id) VALUES ($1, $2, $3, $4, $5);", [levelId, isWin, turns, rating, userId], (r) => {
+          res.json("OK");
+        });
+      }
+    });
   });
 });
