@@ -15,6 +15,8 @@ struct tile_t {
 
 struct level_t {
     std::array<tile_t, level_tiles> tiles;
+    std::string name;
+    int id;
 
     inline int idx(const int &x, const int &y) {
         return (y * level_width) + x;

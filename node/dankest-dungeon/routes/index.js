@@ -113,3 +113,17 @@ router.get("/api/DungeonList", (req, res, next) => {
     res.json(result);
   });
 });
+
+router.get("/api/Dungeon/:id", (req, res, next) => {
+  let db = require("./database");
+  const id = req.params.id;
+  db.doSql("SELECT level_data FROM dungeons WHERE id=$1", [id], (rows) => {
+    if (rows.length != 1) {
+      console.log("Request for non-existent level.");
+      res.json("Error");
+    } else {
+      //console.log(rows[0].level_data);
+      res.json(rows[0].level_data);
+    }
+  });
+});

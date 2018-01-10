@@ -20,7 +20,7 @@ struct input_map_t {
 class play_mode_t : public game_mode_t {
 public:
     play_mode_t() {}
-    play_mode_t(const level_t * level);
+    play_mode_t(const level_t * level, bool testing);
     virtual bool tick(window_t * win);
 private:
     bool playtesting = false;

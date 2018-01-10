@@ -4,10 +4,12 @@
 #include <algorithm>
 #include <vector>
 #include "modestack.hpp"
+#include <emscripten.h>
+#include <emscripten/fetch.h>
 
-play_mode_t::play_mode_t(const level_t * level) {
+play_mode_t::play_mode_t(const level_t * level, bool testing) {
     // Playtest constructor - copy the level to the playable format.
-    playtesting = true;
+    playtesting = testing;
     game_exit_state = IN_PROGRESS;
     game_exit_turns = 0;
 

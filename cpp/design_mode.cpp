@@ -21,10 +21,10 @@ bool design_mode_t::tick(window_t * win) {
         // Build it into a persistent format
         std::string level_data = "";
         for (int i=0; i<level_tiles; ++i) {
-            level_data += level.tiles[i].glyph;
-            level_data += level.tiles[i].r;
-            level_data += level.tiles[i].g;
-            level_data += level.tiles[i].b;
+            level_data += std::to_string(level.tiles[i].glyph) + std::string("X");
+            level_data += std::to_string(level.tiles[i].r) + std::string("X");
+            level_data += std::to_string(level.tiles[i].g) + std::string("X");
+            level_data += std::to_string(level.tiles[i].b) + std::string("X");
         }
 
         // We need to title the dungeon
@@ -162,12 +162,12 @@ void design_mode_t::render_ui(window_t * win) {
     if (win->clicked) {
             if (win->mouse_x > terminal_width - 20) {
                 if (win->mouse_y == terminal_height - 1) {
-                    modestack.emplace(std::make_unique<play_mode_t>(&level));
+                    modestack.emplace(std::make_unique<play_mode_t>(&level, true));
                 }
             }
     }
     if (win->is_key_down(SDLK_PERIOD)) {
-        modestack.emplace(std::make_unique<play_mode_t>(&level));
+        modestack.emplace(std::make_unique<play_mode_t>(&level, true));
     }
     
 }
