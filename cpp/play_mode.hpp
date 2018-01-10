@@ -45,6 +45,9 @@ private:
     item_t amulet;
     std::map<int, trap_t> traps;
     std::map<int, monster_t> monsters;
+    int levelId;
+    std::string levelName;
+    std::string levelCreator;
 
     void cast_visibility();
     void render_map(window_t * win);

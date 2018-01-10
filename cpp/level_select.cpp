@@ -64,7 +64,7 @@ void gotLevel(emscripten_fetch_t *fetch) {
     }
 
     got_level = true;
-    modestack.emplace(std::make_unique<play_mode_t>(&level, true));
+    modestack.emplace(std::make_unique<play_mode_t>(&level, false));
 }
 
 bool level_select_t::tick(window_t * win) {
@@ -100,6 +100,7 @@ bool level_select_t::tick(window_t * win) {
                 if (win->clicked && win->mouse_y == y) {
                     level.id = lvl.id;
                     level.name = lvl.name;
+                    level.creator = lvl.creator;
 
                     // Load the level via AJAX call
                     std::string api_name = "/api/Dungeon/" + std::to_string(lvl.id);

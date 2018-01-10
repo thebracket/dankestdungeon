@@ -13,6 +13,12 @@ play_mode_t::play_mode_t(const level_t * level, bool testing) {
     game_exit_state = IN_PROGRESS;
     game_exit_turns = 0;
 
+    if (!testing) {
+        levelId = level->id;
+        levelName = level->name;
+        levelCreator = level->creator;
+    }
+
     int x = 0;
     int y = 0;
     for (std::size_t i=0; i < level_tiles; ++i) {
@@ -524,7 +530,7 @@ void play_mode_t::render_map(window_t * win) {
         win->print(term_left, 0, "Prove dungeon is beatable!");
         win->print(term_left, 1, "ESCape back to the designer", 128, 128, 128);
     } else {
-        win->print(term_left, 0, "Dungeon Title");
+        win->print_center(0, levelName + std::string(" by ") + levelCreator, 255, 255, 0);
     }
     win->print(term_left, 3, std::string("Turn: ") + std::to_string(turn), 128, 128, 128);
     win->print(term_left, 4, std::string("HP: ") + std::to_string(player.hit_points), 128, 128, 128);
