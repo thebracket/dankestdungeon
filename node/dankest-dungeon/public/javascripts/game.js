@@ -19,6 +19,7 @@ function setup() {
 }
 
 function saveLevel(levelName, levelData) {
+    if (levelName.length < 1) levelName = "Nameless";
     $.ajax({
         type: "POST",
         url: "api/SaveDungeon",
