@@ -185,7 +185,7 @@ h1 {
     pointer-events: none;
   }
   .crt {
-    animation: textShadow 1.6s infinite;
+    /*animation: textShadow 0.8s infinite;*/
   }
   
   
