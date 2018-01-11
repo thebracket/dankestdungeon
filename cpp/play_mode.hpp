@@ -77,11 +77,11 @@ private:
         { SDLK_KP_6, RIGHT },
 
         { SDLK_UP, UP },
-        { SDLK_j, UP },
+        { SDLK_k, UP },
         { SDLK_KP_8, UP },
 
         { SDLK_DOWN, DOWN },
-        { SDLK_k, DOWN },
+        { SDLK_j, DOWN },
         { SDLK_KP_2, DOWN },
 
         { SDLK_KP_9, UPRIGHT},
