@@ -62,6 +62,7 @@ function winGame(turns, levelId) {
 function loseGame(turns, levelId) {
     var token = localStorage.getItem("dankest_token");
     alert("You are dead! You lasted " + turns + " turns. Hopefully you can do better next time.");
+    var rating = getRating();
     $.ajax({
         type: "POST",
         url: "api/SaveRunthrough",
