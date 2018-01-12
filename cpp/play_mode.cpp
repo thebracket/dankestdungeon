@@ -172,7 +172,9 @@ void play_mode_t::cast_visibility() {
             }, 
         [this] (position_t pos) { 
             if (pos.x > 0 && pos.x < level_width && pos.y > 0 && pos.y < level_height) {
-                return !tile_solid[this->mapidx(pos.x, pos.y)]; 
+                const int idx = this->mapidx(pos.x, pos.y);
+                if (tile_render[idx].glyph == '~') return true;
+                return !tile_solid[idx]; 
             } else {
                 return true;
             }
