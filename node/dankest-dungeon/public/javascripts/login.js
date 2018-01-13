@@ -45,7 +45,7 @@ function setup() {
             valid = false;
             errors += "Please select a username of at least 4 characters in length."
         }
-        if (newUser.password.length < 7) {
+        if (newUser.password.length < 4) {
             valid = false;
             errors += "Please select a password of 7 characters or more."
         }
